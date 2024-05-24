@@ -5,7 +5,7 @@
 # 计划任务更新ipset
 
 ```
-0 15 * * * curl -s https://gaoyifan.github.io/china-operator-ip/cmcc.txt | tee /dev/stderr > /etc/mwan3helper/cmcc.txt
+0 15 * * * curl -s https://gaoyifan.github.io/china-operator-ip/cmcc.txt > /etc/mwan3helper/cmcc.txt
 
 0 16 * * * curl -s https://gaoyifan.github.io/china-operator-ip/unicom.txt > /etc/mwan3helper/unicom_cnc.txt
 
