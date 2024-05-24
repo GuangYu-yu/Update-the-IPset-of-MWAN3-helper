@@ -12,6 +12,6 @@ mwan3 helper的IPset中的IP地址段不会进行更新。通过加入到计划�
 0 20 * * * curl -s https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt | tee /dev/stderr | cat - <(curl -s https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute_v6.txt) > /etc/mwan3helper/all_cn.txt
 ```
 
-分别在每天的固定时间更新三大运营商和GFWlist，合并了IPv4和IPv6的地址段。
+分别在每天的固定时间更新三大运营商、GFWlist、中国大陆IP段，合并了IPv4和IPv6。
 
 比如每天`16`点从`https://gaoyifan.github.io/china-operator-ip/cmcc.txt`和`https://gaoyifan.github.io/china-operator-ip/cmcc6.txt`合并后替换`/etc/mwan3helper/cmcc.txt`的内容
