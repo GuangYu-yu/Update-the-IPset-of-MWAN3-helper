@@ -99,6 +99,9 @@ ipset_name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt
 0 18 * * * ipset_name="cmcc4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 0 19 * * * ipset_name="cnc4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 0 20 * * * ipset_name="ct4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
+```
+
+```
 0 21 * * * ipset_name="cn6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 0 22 * * * ipset_name="cn4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 ```
