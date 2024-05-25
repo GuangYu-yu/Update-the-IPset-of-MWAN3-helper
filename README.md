@@ -105,3 +105,48 @@ ipset_name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt
 0 21 * * * ipset_name="cn6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 0 22 * * * ipset_name="cn4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
 ```
+# 原理解析
+
+## 命令 1
+
+初始化变量：定义 ipset_name 为 "NAME6"，url 为 "URL"。
+
+创建配置目录：确保 /etc/ipset_configs 目录存在。
+
+保存URL：将 url 写入配置文件 /etc/ipset_configs/ipset_NAME6.url。
+
+检查并销毁旧的ipset：如果 ipset_name 已存在，则销毁它。
+
+创建新的ipset：创建一个新的 IPv6 地址集合。
+
+添加地址：从 url 获取地址列表并逐个添加到 ipset_name。
+
+创建init.d脚本：如果 /etc/init.d/ipset_NAME6 不存在，创建它。
+
+脚本内容包括：启动服务（从保存的配置恢复或重新创建ipset并从URL重新添加地址）、停止服务（保存当前ipset状态并销毁）、服务触发器。
+
+设置脚本权限并启用：赋予脚本可执行权限并启用它。
+
+保存地址列表：从 url 获取地址列表并保存到 /etc/ipset_configs/ipset_NAME6.txt。
+
+## 命令 2
+
+初始化变量：定义 ipset_name 为 "NAME"。
+
+创建配置目录：确保 /etc/ipset_configs 目录存在。
+
+清空ipset：清空名为 ipset_name 的地址集合。
+
+读取URL：从配置文件 /etc/ipset_configs/ipset_NAME.url 读取URL。
+
+添加地址：从 url 获取地址列表并逐个添加到 ipset_name。
+
+保存地址列表：从 url 获取地址列表并保存到 /etc/ipset_configs/ipset_NAME.txt。
+
+## 总结
+
+命令1提供了一个完整的服务管理方案，包括自动创建、更新和保存ipset，以及服务的启停管理。适用于需要持久化ipset配置和服务管理的场景。
+
+命令2更简洁，适用于仅需临时更新ipset地址集合的场景，不涉及服务的持久化管理。
+
+两者的共同点是都从URL获取地址并更新到指定的ipset，但1在功能上更为全面，适用于复杂场景，而2更为简洁，适用于简单场景。2必须依赖于1才能使用。
