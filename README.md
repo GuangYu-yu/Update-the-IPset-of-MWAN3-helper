@@ -103,19 +103,19 @@ name="cn4"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/
 ## cmcc4
 
 ```
-name="cmcc4"; url="https://gaoyifan.github.io/china-operator-ip/cmcc.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cmcc4"; url="https://ispip.clang.cn/cmcc.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cnc4
 
 ```
-name="cnc4"; url="https://gaoyifan.github.io/china-operator-ip/unicom.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cnc4"; url="https://ispip.clang.cn/unicom_cnc.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## ct4
 
 ```
-name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="ct4"; url="https://ispip.clang.cn/chinatelecom.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 # 计划任务
