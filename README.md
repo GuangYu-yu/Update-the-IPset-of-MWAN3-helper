@@ -2,40 +2,68 @@
 
 这个项目原本是为了定期更新mwan3 helper中的IP段的，但是效果并不好，因此采用别的方式使用IPset分流。无需安装mwan3 helper，通过终端添加ipset并自动更新，设置持久化和开机自启。在同一个IPset内，不能同时调用IPv4和IPv6，因此选择分开执行。mwan3 helper内的IP段从未更新且仅有IPv4地址，对于多宽带分流来说非常鸡肋。
 
-使用时请确保安装了`ipset`、`curl`、`xargs`依赖
+使用时请确保安装了`coreutils-mkdir` `coreutils-sed` `coreutils-awk` `wget` `ipset` `grep` `coreutils-mv` `coreutils-chmod`依赖
+
+mkdir：用于创建目录。
+
+echo：用于将文本写入文件。
+
+sed：用于在文件内容前添加文本。
+
+awk：用于从文件中提取字段。
+
+wget：用于从指定的URL下载文件。
+
+ipset：用于管理IP集（IP sets），创建、刷新和恢复IP集。
+
+grep：用于搜索文件内容。
+
+mv：用于移动或重命名文件。
+
+chmod：用于修改文件的权限。
+
+```
+opkg update && opkg install coreutils-mkdir coreutils-sed coreutils-awk wget ipset grep coreutils-mv coreutils-chmod
+```
 
 # 终端内首次运行
 
-## IPv6 IPset
-
 ```
-ipset_name="NAME6"; url="URL"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet6; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet6; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+mkdir -p /etc/ipset_configs && echo -e '#!/bin/sh\n\nCFG_DIR="/etc/ipset_configs"\n\nvalidate_input() {\n    if [[ ! "$name" =~ ^[a-zA-Z0-9_-]+$ ]] || [[ ! "$url" =~ ^https?:// ]]; then\n        echo "Invalid name or url"; exit 1\n    fi\n    if [ "$type" != "4" ] && [ "$type" != "6" ]; then\n        echo "Invalid type"; exit 1\n    fi\n}\n\nadd_ipset() {\n    validate_input\n    family="inet$( [ "$type" -eq 6 ] && echo "6")"\n    f=$CFG_DIR/${name}.txt\n    rm -f $f && wget -qO $f $url\n    if [ ! -s $f ]; then echo "Failed to download or empty file"; exit 1; fi\n    ipset create $name hash:net family $family -exist\n    ipset flush $name\n    while IFS= read -r line; do\n        ipset add $name $line -exist\n    done < $f\n    grep -v "^$name " $CFG_DIR/ipset_list > /tmp/ipset_list\n    mv /tmp/ipset_list $CFG_DIR/ipset_list\n    echo "$name $url $type" >> $CFG_DIR/ipset_list\n}\n\nclear_and_update_ipset() {\n    validate_input\n    f=$CFG_DIR/${name}.txt\n    > $f\n    url=$(grep "^$name " $CFG_DIR/ipset_list | awk "{print \$2}")\n    wget -qO $f $url\n    if [ ! -s $f ]; then echo "Failed to download or empty file"; exit 1; fi\n    ipset flush $name\n    while IFS= read -r line; do\n        ipset add $name $line -exist\n    done < $f\n}\n' > /etc/ipset_configs/vars.sh && > /etc/ipset_configs/ipset_list && echo -e '#!/bin/sh /etc/rc.common\n\nSTART=99\nstart() {\n    . /etc/ipset_configs/vars.sh\n    while IFS=" " read -r name url type; do\n        family="inet$( [ "$type" -eq 6 ] && echo "6")"\n        f=$CFG_DIR/${name}.txt\n        [ -f $f ] && ipset create $name hash:net family $family -exist && ipset flush $name && while IFS= read -r line; do ipset add $name $line -exist; done < $f\n    done < $CFG_DIR/ipset_list\n}' > /etc/init.d/ipset_load && chmod +x /etc/init.d/ipset_load && /etc/init.d/ipset_load enable
 ```
 
-## IPv4 IPset
+创建 /etc/ipset_configs 目录。用于缓存IP段，会将IPset的IP段保存至对应的txt文件中。
+
+创建 vars.sh 文件。之后写入相关变量和函数，用于后续命令来调用它们。
+
+创建 ipset_list 文件。用于保存IPset名称，及其对应的URL
+
+创建 /etc/init.d/ipset_load 文件。用于开机启动，并将缓存内的IP段导入到IPset之中。
+
+# 添加IPset并导入
 
 ```
-ipset_name="NAME4"; url="URL"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="NAME"; url="URL"; type="IP"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
-> 将`NAME4`、`NAME6`、`URL`自定义，注意：`IPv6 IPset`和`IPv4 IPset`并不一致，区别在于`inet6`和`inet`。IP段被缓存在/etc/ipset_configs的txt文件之中
+> 将`NAME`、`URL`、`IP`自定义。其中 `NAME` 对应IPset名称,只能包含字母（不区分大小写）、数字、下划线 (_) 和短横线 (-)。 `URL` 是其对应链接，必须以 `http://` 或 `https://` 开头。 `IP` 只能填写 `4` 或 `6` ，对应IPv4或IPv6。IP段被缓存在/etc/ipset_configs的txt文件之中
 
 # 定时更新
 
-后续只需要运行以下两行命令就可以更新IPset
+后续只需要运行以下命令就可以更新IPset
 
 ```
-ipset_name="NAME"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
+name="NAME"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
 ```
 
-> 只需要修改`NAME`即可，IPv4和IPv6的后续命令是通用的
+> 只需要修改`NAME`即可
 
 在命令前面加入（* * * * * ），就可以在计划任务中定期运行，注意空格位置
 
 比如
 
 ```
-0 20 * * * ipset_name="cn6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
+0 20 * * * name="cn6"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
 ```
 
 意味着每天`20`点自动更新`cn6`的IP段
@@ -45,108 +73,65 @@ ipset_name="NAME"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(c
 ## cn6
 
 ```
-ipset_name="cn6"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute_v6.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet6; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet6; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cn6"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cmcc6
 
 ```
-ipset_name="cmcc6"; url="https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet6; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet6; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cmcc6"; url="https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cnc6
 
 ```
-ipset_name="cnc6"; url="https://gaoyifan.github.io/china-operator-ip/unicom6.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet6; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet6; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cnc6"; url="https://gaoyifan.github.io/china-operator-ip/unicom6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## ct6
 
 ```
-ipset_name="ct6"; url="https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet6; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet6; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="ct6"; url="https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cn4
 
 ```
-ipset_name="cn4"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cn4"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cmcc4
 
 ```
-ipset_name="cmcc4"; url="https://gaoyifan.github.io/china-operator-ip/cmcc.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cmcc4"; url="https://gaoyifan.github.io/china-operator-ip/cmcc.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cnc4
 
 ```
-ipset_name="cnc4"; url="https://gaoyifan.github.io/china-operator-ip/unicom.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="cnc4"; url="https://gaoyifan.github.io/china-operator-ip/unicom.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## ct4
 
 ```
-ipset_name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt"; mkdir -p /etc/ipset_configs; echo $url > /etc/ipset_configs/ipset_$ipset_name.url; ipset -L $ipset_name &>/dev/null && ipset destroy $ipset_name; ipset create $ipset_name hash:net family inet; curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; [[ ! -f /etc/init.d/ipset_$ipset_name ]] && { echo -e '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\nstart_service() {\n    [ -f /etc/ipset_configs/ipset_$ipset_name.save ] && ipset restore < /etc/ipset_configs/ipset_$ipset_name.save || { ipset create '"$ipset_name"' hash:net family inet; curl -s $(cat /etc/ipset_configs/ipset_'$ipset_name'.url) | xargs -n1 -I{} ipset add '"$ipset_name"' {}; }\n}\nstop_service() {\n    ipset save $ipset_name > /etc/ipset_configs/ipset_$ipset_name.save\n    ipset destroy $ipset_name\n}\nservice_triggers() {\n    procd_add_reload_trigger ipset_$ipset_name\n}\n' > /etc/init.d/ipset_$ipset_name; chmod +x /etc/init.d/ipset_$ipset_name; /etc/init.d/ipset_$ipset_name enable; }; curl -s $(cat /etc/ipset_configs/ipset_$ipset_name.url) > /etc/ipset_configs/ipset_$ipset_name.txt
+name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 # 计划任务
 
 ```
-0 15 * * * ipset_name="cmcc6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 16 * * * ipset_name="cnc6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 17 * * * ipset_name="ct6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 18 * * * ipset_name="cmcc4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 19 * * * ipset_name="cnc4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 20 * * * ipset_name="ct4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-```
+0 15 * * * name="cmcc6"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 16 * * * name="cnc6"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 17 * * * name="ct6"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 18 * * * name="cmcc4"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 19 * * * name="cnc4"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 20 * * * name="ct4"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
 
 ```
-0 21 * * * ipset_name="cn6"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
-0 22 * * * ipset_name="cn4"; mkdir -p /etc/ipset_configs; ipset flush $ipset_name; url=$(cat /etc/ipset_configs/ipset_$ipset_name.url); curl -s $url | xargs -n1 -I{} ipset add $ipset_name {}; curl -s $url > /etc/ipset_configs/ipset_$ipset_name.txt
+
 ```
-# 原理解析
+0 21 * * * name="cn6"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
+0 22 * * * name="cn4"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
 
-## 命令 1
-
-初始化变量：定义 ipset_name 为 "NAME6"，url 为 "URL"。
-
-创建配置目录：确保 /etc/ipset_configs 目录存在。
-
-保存URL：将 url 写入配置文件 /etc/ipset_configs/ipset_NAME6.url。
-
-检查并销毁旧的ipset：如果 ipset_name 已存在，则销毁它。
-
-创建新的ipset：创建一个新的 IPv6 地址集合。
-
-添加地址：从 url 获取地址列表并逐个添加到 ipset_name。
-
-创建init.d脚本：如果 /etc/init.d/ipset_NAME6 不存在，创建它。
-
-脚本内容包括：启动服务（从保存的配置恢复或重新创建ipset并从URL重新添加地址）、停止服务（保存当前ipset状态并销毁）、服务触发器。
-
-设置脚本权限并启用：赋予脚本可执行权限并启用它。
-
-保存地址列表：从 url 获取地址列表并保存到 /etc/ipset_configs/ipset_NAME6.txt。
-
-## 命令 2
-
-初始化变量：定义 ipset_name 为 "NAME"。
-
-创建配置目录：确保 /etc/ipset_configs 目录存在。
-
-清空ipset：清空名为 ipset_name 的地址集合。
-
-读取URL：从配置文件 /etc/ipset_configs/ipset_NAME.url 读取URL。
-
-添加地址：从 url 获取地址列表并逐个添加到 ipset_name。
-
-保存地址列表：从 url 获取地址列表并保存到 /etc/ipset_configs/ipset_NAME.txt。
-
-## 总结
-
-命令1提供了一个完整的服务管理方案，包括自动创建、更新和保存ipset，以及服务的启停管理。适用于需要持久化ipset配置和服务管理的场景。
-
-命令2更简洁，适用于仅需临时更新ipset地址集合的场景，不涉及服务的持久化管理。
-
-两者的共同点是都从URL获取地址并更新到指定的ipset，但1在功能上更为全面，适用于复杂场景，而2更为简洁，适用于简单场景。2必须依赖于1才能使用。
+```
