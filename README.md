@@ -23,7 +23,7 @@ mv：用于移动或重命名文件。
 chmod：用于修改文件的权限。
 
 ```
-opkg update && opkg install coreutils-mkdir wget ipset grep coreutils-mv coreutils-chmod busybox
+opkg update && opkg install coreutils-mkdir wget ipset grep coreutils-mv coreutils-chmod busybox coreutils
 ```
 
 # 终端内首次运行
