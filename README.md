@@ -1,8 +1,8 @@
 # Update-the-IPset-of-MWAN3-helper
 
-这个项目原本是为了定期更新mwan3 helper中的IP段的，但是效果并不好，因此采用别的方式使用IPset分流。无需安装mwan3 helper，通过终端添加ipset并自动更新，设置持久化和开机自启。在同一个IPset内，不能同时调用IPv4和IPv6，因此选择分开执行。mwan3 helper内的IP段从未更新且仅有IPv4地址，对于多宽带分流来说非常鸡肋。
+无需安装mwan3 helper，通过终端添加ipset并自动更新，设置持久化和开机自启。在同一个IPset内，不能同时调用IPv4和IPv6，因此选择分开执行。
 
-使用时请确保安装了`coreutils-mkdir` `coreutils-sed` `coreutils-awk` `wget` `ipset` `grep` `coreutils-mv` `coreutils-chmod`依赖
+使用前请确保安装了依赖
 
 mkdir：用于创建目录。
 
@@ -71,7 +71,7 @@ name="NAME"; . /etc/ipset_configs/vars.sh; clear_and_update_ipset
 ## cn6
 
 ```
-name="cn6"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cn6"; url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cmcc6
@@ -95,7 +95,7 @@ name="ct6"; url="https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"; ty
 ## cn4
 
 ```
-name="cn4"; url="https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cn4"; url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cmcc4
