@@ -8,6 +8,8 @@ mkdir：用于创建目录。
 
 echo：用于将文本写入文件。
 
+awk：用于从匹配的行中提取特定列的数据。
+
 sed：用于在文件内容前添加文本。
 
 wget：用于从指定的URL下载文件。
@@ -21,7 +23,7 @@ mv：用于移动或重命名文件。
 chmod：用于修改文件的权限。
 
 ```
-opkg update && opkg install coreutils-mkdir wget ipset grep coreutils-mv coreutils-chmod dnsmasq-full
+opkg update && opkg install coreutils-mkdir wget ipset grep coreutils-mv coreutils-chmod busybox
 ```
 
 # 终端内首次运行
