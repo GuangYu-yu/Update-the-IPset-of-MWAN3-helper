@@ -1,29 +1,11 @@
-# Update-the-IPset-of-MWAN3-helper
+# Update-the-IPset
 
 无需安装mwan3 helper，通过终端添加ipset并自动更新，设置持久化和开机自启。在同一个IPset内，不能同时调用IPv4和IPv6，因此选择分开执行。
 
 使用前请确保安装了依赖
 
-mkdir：用于创建目录。
-
-echo：用于将文本写入文件。
-
-awk：用于从匹配的行中提取特定列的数据。
-
-sed：用于在文件内容前添加文本。
-
-wget：用于从指定的URL下载文件。
-
-ipset：用于管理IP集（IP sets），创建、刷新和恢复IP集。
-
-grep：用于搜索文件内容。
-
-mv：用于移动或重命名文件。
-
-chmod：用于修改文件的权限。
-
 ```
-opkg update && opkg install coreutils-mkdir wget ipset grep coreutils-mv coreutils-chmod busybox coreutils
+opkg update && opkg install ipset busybox coreutils
 ```
 
 # 终端内首次运行
