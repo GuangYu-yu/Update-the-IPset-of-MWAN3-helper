@@ -1,6 +1,25 @@
 allow-lan: true
 ipv6: true
 
+geo-auto-update: true
+geo-update-interval: 8
+
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  asn: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
+
 profile:
   store-selected: true
 
@@ -11,7 +30,7 @@ proxies:
     type: direct
     ip-version: ipv4
     interface-name: eth2
-    routing-mark: cmcc_v4
+    routing-mark: 1
     udp: true
     tfo: true
     mptcp: true
@@ -27,7 +46,7 @@ proxies:
     type: direct
     ip-version: ipv4
     interface-name: eth1
-    routing-mark: unicom_v4
+    routing-mark: 2
     udp: true
     tfo: true
     mptcp: true
@@ -42,7 +61,7 @@ proxies:
     type: direct
     ip-version: ipv4
     interface-name: eth3
-    routing-mark: chinanet_v4
+    routing-mark: 3
     udp: true
     tfo: true
     mptcp: true
@@ -57,7 +76,7 @@ proxies:
     type: direct
     ip-version: ipv6
     interface-name: eth2
-    routing-mark: cmcc_v6
+    routing-mark: 4
     udp: true
     tfo: true
     mptcp: true
@@ -72,7 +91,7 @@ proxies:
     type: direct
     ip-version: ipv6
     interface-name: eth1
-    routing-mark: unicom_v6
+    routing-mark: 5
     udp: true
     tfo: true
     mptcp: true
@@ -87,7 +106,7 @@ proxies:
     type: direct
     ip-version: ipv6
     interface-name: eth3
-    routing-mark: chinanet_v6
+    routing-mark: 6
     udp: true
     tfo: true
     mptcp: true
@@ -214,39 +233,20 @@ rules:
   - RULE-SET,下载,国内轮询
   - RULE-SET,游戏下载,国内轮询
   - RULE-SET,应用分类,国内轮询
-  - RULE-SET,流媒体,国内轮询
 
-  # 实时性要求高的协议使用粘性负载均衡
-  - NETWORK,UDP,国内粘性      # 游戏、视频会议等实时通信
-  - NETWORK,QUIC,国内粘性     # HTTP/3、新版视频流等
-  - NETWORK,ICMP,国内粘性     # ping等网络诊断
-  - NETWORK,TFO,国内粘性      # TCP快速打开
-  - NETWORK,MPTCP,国内粘性    # 多路径TCP
-  - NETWORK,SCTP,国内粘性     # 流控制传输协议
-  - NETWORK,STUN,国内粘性     # NAT穿透
-  - NETWORK,RTP,国内粘性      # 实时传输协议
-  - NETWORK,RTCP,国内粘性     # 实时传输控制协议
-  
-  # 大流量传输协议使用轮询负载均衡
-  - NETWORK,TCP,国内轮询      # 普通TCP连接
-  - NETWORK,FTP,国内轮询      # 文件传输
-  - NETWORK,HTTP,国内轮询     # HTTP流量
-  - NETWORK,HTTPS,国内轮询    # HTTPS流量
-  - NETWORK,SMTP,国内轮询     # 邮件发送
-  - NETWORK,POP3,国内轮询     # 邮件接收
-  - NETWORK,IMAP,国内轮询     # 邮件同步
-  - NETWORK,SMB,国内轮询      # 文件共享
-  - NETWORK,NFS,国内轮询      # 网络文件系统
-  - NETWORK,WebDAV,国内轮询   # 网络文件传输
+  # 网络层协议
+  - NETWORK,UDP,国内粘性
+  - NETWORK,TCP,国内轮询
 
   # IP分流
-  - IP-CIDR-RULES,@中国移动v4,移动v4
-  - IP-CIDR-RULES,@中国移动v6,移动v6
-  - IP-CIDR-RULES,@中国联通v4,联通v4
-  - IP-CIDR-RULES,@中国联通v6,联通v6
-  - IP-CIDR-RULES,@中国电信v4,电信v4
-  - IP-CIDR-RULES,@中国电信v6,电信v6
+  - RULE-SET,中国移动v4,移动v4
+  - RULE-SET,中国移动v6,移动v6
+  - RULE-SET,中国联通v4,联通v4
+  - RULE-SET,中国联通v6,联通v6
+  - RULE-SET,中国电信v4,电信v4
+  - RULE-SET,中国电信v6,电信v6
+
   # 直连
   - GEOIP,LAN,DIRECT
   - GEOIP,CN,国内
-  - MATCH,home
+  - MATCH,国内轮询
