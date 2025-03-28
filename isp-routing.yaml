@@ -118,39 +118,50 @@ proxies:
         enabled: true
 
 proxy-groups:
-  - name: "国内"
+  - name: "移动"
     type: select
     proxies:
       - 移动v4
-      - 联通v4
-      - 电信v4
       - 移动v6
+
+  - name: "联通"
+    type: select
+    proxies:
+      - 联通v4
       - 联通v6
+
+  - name: "电信"
+    type: select
+    proxies:
+      - 电信v4
       - 电信v6
+
+  - name: "国内"
+    type: select
+    proxies:
+      - 移动
+      - 联通
+      - 电信
       - 国内轮询
       - 国内粘性
+
   - name: "国内轮询"
     type: load-balance
     strategy: round-robin
     proxies:
-      - 移动v4
-      - 联通v4
-      - 电信v4
-      - 移动v6
-      - 联通v6
-      - 电信v6
+      - 移动
+      - 联通
+      - 电信
     url: 'https://www.qq.com/favicon.ico'
     interval: 10
+
   - name: "国内粘性"
     type: load-balance
     strategy: consistent-hashing
     proxies:
-      - 移动v4
-      - 联通v4
-      - 电信v4
-      - 移动v6
-      - 联通v6
-      - 电信v6
+      - 移动
+      - 联通
+      - 电信
     url: 'https://www.qq.com/favicon.ico'
     interval: 10
 
@@ -214,6 +225,30 @@ rule-providers:
     format: yaml
     path: ./ruleset/Download.yaml
 
+  移动ASN:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/你的用户名/你的仓库名@分支/mobile_asn.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: ./ruleset/mobile_asn.yaml
+
+  联通ASN:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/你的用户名/你的仓库名@分支/unicom_asn.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: ./ruleset/unicom_asn.yaml
+
+  电信ASN:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/你的用户名/你的仓库名@分支/telecom_asn.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: ./ruleset/telecom_asn.yaml
+
 rules:
   - DOMAIN-SUFFIX,jsdelivr.net,DIRECT
   - DOMAIN-SUFFIX,github.io,DIRECT
@@ -233,6 +268,11 @@ rules:
   - RULE-SET,中国联通v6,联通v6
   - RULE-SET,中国电信v4,电信v4
   - RULE-SET,中国电信v6,电信v6
+
+  # ASN分流
+  - RULE-SET,移动ASN,移动
+  - RULE-SET,联通ASN,联通
+  - RULE-SET,电信ASN,电信
 
   # 直连
   - GEOIP,LAN,DIRECT
