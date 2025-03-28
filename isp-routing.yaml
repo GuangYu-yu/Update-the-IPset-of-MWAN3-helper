@@ -159,44 +159,44 @@ rule-providers:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/cmcc.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/cmcc.yaml
   中国移动v6:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/cmcc6.yaml
   中国联通v4:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/unicom.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/unicom.yaml
   中国联通v6:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/unicom6.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/unicom6.yaml
   中国电信v4:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/chinanet.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/chinanet.yaml
   中国电信v6:
     type: http
     url: "https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"
     interval: 3600
-    proxy: 国内轮询
     behavior: ipcidr
     format: text
+    path: ./ruleset/chinanet6.yaml
 
   视频:
     type: http
@@ -204,6 +204,7 @@ rule-providers:
     interval: 86400
     behavior: classical
     format: yaml
+    path: ./ruleset/ChinaMedia.yaml
 
   游戏下载:
     type: http
@@ -211,6 +212,7 @@ rule-providers:
     interval: 86400
     behavior: classical
     format: yaml
+    path: ./ruleset/GameDownloadCN.yaml
     
   下载:
     type: http
@@ -218,6 +220,7 @@ rule-providers:
     interval: 86400
     behavior: classical
     format: yaml
+    path: ./ruleset/Download.yaml
 
   应用分类:
     type: http
@@ -225,6 +228,7 @@ rule-providers:
     interval: 86400
     behavior: classical
     format: text
+    path: ./ruleset/applications.yaml
 
 
 rules:
