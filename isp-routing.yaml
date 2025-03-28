@@ -1,0 +1,289 @@
+allow-lan: true
+ipv6: true
+
+profile:
+  store-selected: true
+
+tcp-concurrent: true
+
+proxies:
+  - name: "移动v4"
+    type: direct
+    ip-version: ipv4
+    interface-name: eth2
+    routing-mark: cmcc_v4
+    udp: true
+    tfo: true
+    mptcp: true
+
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+  - name: "联通v4"
+    type: direct
+    ip-version: ipv4
+    interface-name: eth1
+    routing-mark: unicom_v4
+    udp: true
+    tfo: true
+    mptcp: true
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+  - name: "电信v4"
+    type: direct
+    ip-version: ipv4
+    interface-name: eth3
+    routing-mark: chinanet_v4
+    udp: true
+    tfo: true
+    mptcp: true
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+  - name: "移动v6"
+    type: direct
+    ip-version: ipv6
+    interface-name: eth2
+    routing-mark: cmcc_v6
+    udp: true
+    tfo: true
+    mptcp: true
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+  - name: "联通v6"
+    type: direct
+    ip-version: ipv6
+    interface-name: eth1
+    routing-mark: unicom_v6
+    udp: true
+    tfo: true
+    mptcp: true
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+  - name: "电信v6"
+    type: direct
+    ip-version: ipv6
+    interface-name: eth3
+    routing-mark: chinanet_v6
+    udp: true
+    tfo: true
+    mptcp: true
+    smux:
+      enabled: true
+      protocol: h2mux
+      only-tcp: false
+      brutal-opts:
+        enabled: true
+
+proxy-groups:
+  - name: "国内"
+    type: select
+    proxies:
+      - 移动v4
+      - 联通v4
+      - 电信v4
+      - 移动v6
+      - 联通v6
+      - 电信v6
+      - 国内轮询
+      - 国内粘性
+  - name: "国内轮询"
+    type: load-balance
+    strategy: round-robin
+    proxies:
+      - 移动v4
+      - 联通v4
+      - 电信v4
+      - 移动v6
+      - 联通v6
+      - 电信v6
+    url: 'https://www.qq.com/favicon.ico'
+    interval: 10
+  - name: "国内粘性"
+    type: load-balance
+    strategy: consistent-hashing
+    proxies:
+      - 移动v4
+      - 联通v4
+      - 电信v4
+      - 移动v6
+      - 联通v6
+      - 电信v6
+    url: 'https://www.qq.com/favicon.ico'
+    interval: 10
+
+rule-providers:
+  中国移动v4:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/cmcc.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+  中国移动v6:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+  中国联通v4:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/unicom.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+  中国联通v6:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/unicom6.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+  中国电信v4:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/chinanet.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+  中国电信v6:
+    type: http
+    url: "https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"
+    interval: 3600
+    proxy: 国内轮询
+    behavior: ipcidr
+    format: text
+
+  视频:
+    type: http
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/ChinaMedia/ChinaMedia.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+
+  游戏下载:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Game/GameDownloadCN/GameDownloadCN.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+    
+  下载:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Download/Download.yaml"
+    interval: 86400
+    behavior: classical
+    format: yaml
+
+  应用分类:
+    type: http
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    interval: 86400
+    behavior: classical
+    format: text
+
+
+rules:
+  # 应用层协议和服务
+  - RULE-SET,视频,国内轮询
+  - RULE-SET,下载,国内轮询
+  - RULE-SET,游戏下载,国内轮询
+  - RULE-SET,应用分类,国内轮询
+  - RULE-SET,流媒体,国内轮询
+
+  # 实时性要求高的协议使用粘性负载均衡
+  - NETWORK,UDP,国内粘性      # 游戏、视频会议等实时通信
+  - NETWORK,QUIC,国内粘性     # HTTP/3、新版视频流等
+  - NETWORK,ICMP,国内粘性     # ping等网络诊断
+  - NETWORK,TFO,国内粘性      # TCP快速打开
+  - NETWORK,MPTCP,国内粘性    # 多路径TCP
+  - NETWORK,SCTP,国内粘性     # 流控制传输协议
+  - NETWORK,STUN,国内粘性     # NAT穿透
+  - NETWORK,RTP,国内粘性      # 实时传输协议
+  - NETWORK,RTCP,国内粘性     # 实时传输控制协议
+  
+  # 大流量传输协议使用轮询负载均衡
+  - NETWORK,TCP,国内轮询      # 普通TCP连接
+  - NETWORK,FTP,国内轮询      # 文件传输
+  - NETWORK,HTTP,国内轮询     # HTTP流量
+  - NETWORK,HTTPS,国内轮询    # HTTPS流量
+  - NETWORK,SMTP,国内轮询     # 邮件发送
+  - NETWORK,POP3,国内轮询     # 邮件接收
+  - NETWORK,IMAP,国内轮询     # 邮件同步
+  - NETWORK,SMB,国内轮询      # 文件共享
+  - NETWORK,NFS,国内轮询      # 网络文件系统
+  - NETWORK,WebDAV,国内轮询   # 网络文件传输
+
+  # IP分流
+  - IP-CIDR-RULES,@中国移动v4,移动v4
+  - IP-CIDR-RULES,@中国移动v6,移动v6
+  - IP-CIDR-RULES,@中国联通v4,联通v4
+  - IP-CIDR-RULES,@中国联通v6,联通v6
+  - IP-CIDR-RULES,@中国电信v4,电信v4
+  - IP-CIDR-RULES,@中国电信v6,电信v6
+  # ASN分流
+  - IP-ASN,9808,移动v4
+  - IP-ASN,56040,移动v4
+  - IP-ASN,58807,移动v4
+  - IP-ASN,9231,移动v4
+  - IP-ASN,24138,移动v4
+  - IP-ASN,24137,移动v4
+  - IP-ASN,9808,移动v6
+  - IP-ASN,56040,移动v6
+  - IP-ASN,58807,移动v6
+  - IP-ASN,9231,移动v6
+  - IP-ASN,24138,移动v6
+  - IP-ASN,24137,移动v6
+  - IP-ASN,4837,联通v4
+  - IP-ASN,17621,联通v4
+  - IP-ASN,17622,联通v4
+  - IP-ASN,17623,联通v4
+  - IP-ASN,4808,联通v4
+  - IP-ASN,9929,联通v4
+  - IP-ASN,4837,联通v6
+  - IP-ASN,17621,联通v6
+  - IP-ASN,17622,联通v6
+  - IP-ASN,17623,联通v6
+  - IP-ASN,4808,联通v6
+  - IP-ASN,9929,联通v6
+  - IP-ASN,4134,电信v4
+  - IP-ASN,4809,电信v4
+  - IP-ASN,23724,电信v4
+  - IP-ASN,4812,电信v4
+  - IP-ASN,133774,电信v4
+  - IP-ASN,133119,电信v4
+  - IP-ASN,4134,电信v6
+  - IP-ASN,4809,电信v6
+  - IP-ASN,23724,电信v6
+  - IP-ASN,4812,电信v6
+  - IP-ASN,133774,电信v6
+  - IP-ASN,133119,电信v6
+  # 直连
+  - GEOIP,LAN,DIRECT
+  - GEOIP,CN,国内
+  - MATCH,home
