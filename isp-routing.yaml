@@ -198,14 +198,6 @@ rule-providers:
     format: text
     path: ./ruleset/chinanet6.yaml
 
-  视频:
-    type: http
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/ChinaMedia/ChinaMedia.yaml"
-    interval: 86400
-    behavior: classical
-    format: yaml
-    path: ./ruleset/ChinaMedia.yaml
-
   游戏下载:
     type: http
     url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Game/GameDownloadCN/GameDownloadCN.yaml"
@@ -222,21 +214,13 @@ rule-providers:
     format: yaml
     path: ./ruleset/Download.yaml
 
-  应用分类:
-    type: http
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
-    interval: 86400
-    behavior: classical
-    format: text
-    path: ./ruleset/applications.yaml
-
-
 rules:
+  - DOMAIN-SUFFIX,jsdelivr.net,DIRECT
+  - DOMAIN-SUFFIX,github.io,DIRECT
+
   # 应用层协议和服务
-  - RULE-SET,视频,国内轮询
   - RULE-SET,下载,国内轮询
   - RULE-SET,游戏下载,国内轮询
-  - RULE-SET,应用分类,国内轮询
 
   # 网络层协议
   - NETWORK,UDP,国内粘性
