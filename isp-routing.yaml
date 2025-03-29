@@ -1,207 +1,196 @@
 allow-lan: true
 ipv6: true
-
 geo-auto-update: true
-geo-update-interval: 8
-
+geo-update-interval: 12
 dns:
   enable: true
-  listen: 0.0.0.0:53
+  # DNS监听地址
+  listen: 0.0.0.0:6123
   default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-
+  # 本地DNS服务器
+  - 223.5.5.5
+  - 223.6.6.6
+  - 119.29.29.29
+  - 119.28.28.28
+  - "2400:3200::1"
+  - "2400:3200:baba::1"
+  - "2402:4e00::"
+  - "2402:4e00:1::"
+  ipv6: true
 geox-url:
-  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
-  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
-  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
-  asn: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
-
+  geoip: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat
+  geosite: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat
+  mmdb: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb
+  asn: https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb
 profile:
   store-selected: true
-
 tcp-concurrent: true
-
 proxies:
-  - name: "移动"
-    type: direct
-    ip-version: ipv6-prefer
-    interface-name: pppoe-cmcc
-    udp: true
-    routing-mark: 1
-
-  - name: "联通"
-    type: direct
-    ip-version: ipv6-prefer
-    interface-name: pppoe-cnc
-    udp: true
-    routing-mark: 2
-
-  - name: "电信"
-    type: direct
-    ip-version: ipv6-prefer
-    interface-name: pppoe-ct
-    udp: true
-    routing-mark: 3
-
+- name: 移动
+  type: direct
+  ip-version: ipv6-prefer
+  interface-name: pppoe-cmcc
+  udp: true
+  routing-mark: 1
+- name: 联通
+  type: direct
+  ip-version: ipv6-prefer
+  interface-name: pppoe-cnc
+  udp: true
+  routing-mark: 2
+- name: 电信
+  type: direct
+  ip-version: ipv6-prefer
+  interface-name: pppoe-ct
+  udp: true
+  routing-mark: 3
 proxy-groups:
-  - name: "国内"
-    type: select
-    proxies:
-      - 移动
-      - 联通
-      - 电信
-      - 一致性哈希
-      - 会话保持
-      - 轮询
-    health-check:
-      enable: true
-      url: https://www.qq.com/favicon.ico
-      interval: 300
-      timeout: 5000
-      lazy: false
-
-  - name: "一致性哈希"
-    type: load-balance
-    strategy: consistent-hashing
-    proxies:
-      - 移动
-      - 联通
-      - 电信
-    health-check:
-      enable: true
-      url: https://www.qq.com/favicon.ico
-      interval: 300
-      timeout: 5000
-      lazy: false
-
-  - name: "会话保持"
-    type: load-balance
-    strategy: sticky-sessions
-    proxies:
-      - 移动
-      - 联通
-      - 电信
-    health-check:
-      enable: true
-      url: https://www.qq.com/favicon.ico
-      interval: 300
-      timeout: 5000
-      lazy: false
-
-  - name: "轮询"
-    type: load-balance
-    strategy: round-robin
-    proxies:
-      - 移动
-      - 联通
-      - 电信
-    health-check:
-      enable: true
-      url: URL_ADDRESS.qq.com/favicon.ico
-      interval: 300
-      timeout: 5000
-      lazy: false
-      
-  - name: "漏网之鱼"
-    type: select
-    proxies:
-      - 移动
-      - 联通
-      - 电信
-      - 一致性哈希
-      - 会话保持
-      - 轮询
-
+- name: 国内
+  type: select
+  proxies:
+  - 移动
+  - 联通
+  - 电信
+  - 一致性哈希
+  - 会话保持
+  - 轮询
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
+- name: 一致性哈希
+  type: load-balance
+  strategy: consistent-hashing
+  proxies:
+  - 移动
+  - 联通
+  - 电信
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
+- name: 会话保持
+  type: load-balance
+  strategy: sticky-sessions
+  proxies:
+  - 移动
+  - 联通
+  - 电信
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
+- name: 轮询
+  type: load-balance
+  strategy: round-robin
+  proxies:
+  - 移动
+  - 联通
+  - 电信
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
+- name: 漏网之鱼
+  type: select
+  proxies:
+  - 移动
+  - 联通
+  - 电信
+  - 一致性哈希
+  - 会话保持
+  - 轮询
 rule-providers:
   中国移动v4:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/cmcc.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/cmcc.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/cmcc.yaml
+    path: "./ruleset/cmcc.txt"
   中国移动v6:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/cmcc6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/cmcc6.yaml
+    path: "./ruleset/cmcc6.txt"
   中国联通v4:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/unicom.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/unicom.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/unicom.yaml
+    path: "./ruleset/unicom.txt"
   中国联通v6:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/unicom6.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/unicom6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/unicom6.yaml
+    path: "./ruleset/unicom6.txt"
   中国电信v4:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/chinanet.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/chinanet.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/chinanet.yaml
+    path: "./ruleset/chinanet.txt"
   中国电信v6:
     type: http
-    url: "https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"
+    url: https://gaoyifan.github.io/china-operator-ip/chinanet6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: ./ruleset/chinanet6.yaml
-
+    path: "./ruleset/chinanet6.txt"
   移动ASN:
     type: http
-    url: "https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/mobile_asn.yaml"
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/mobile_asn.yaml
     interval: 86400
     behavior: classical
     format: yaml
-    path: ./ruleset/mobile_asn.yaml
-
+    path: "./ruleset/mobile_asn.yaml"
   联通ASN:
     type: http
-    url: "https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/unicom_asn.yaml"
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/unicom_asn.yaml
     interval: 86400
     behavior: classical
     format: yaml
-    path: ./ruleset/unicom_asn.yaml
-
+    path: "./ruleset/unicom_asn.yaml"
   电信ASN:
     type: http
-    url: "https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/telecom_asn.yaml"
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/telecom_asn.yaml
     interval: 86400
     behavior: classical
     format: yaml
-    path: ./ruleset/telecom_asn.yaml
-
+    path: "./ruleset/telecom_asn.yaml"
 rules:
-  - DOMAIN-SUFFIX,jsdelivr.net,DIRECT
-  - DOMAIN-SUFFIX,github.io,DIRECT
+- DOMAIN-SUFFIX,jsdelivr.net,DIRECT
+- DOMAIN-SUFFIX,github.io,DIRECT
+- DOMAIN-SUFFIX,gh-proxy.com,DIRECT
 
-  # IP分流
-  - RULE-SET,中国移动v4,移动
-  - RULE-SET,中国移动v6,移动
-  - RULE-SET,中国联通v4,联通
-  - RULE-SET,中国联通v6,联通
-  - RULE-SET,中国电信v4,电信
-  - RULE-SET,中国电信v6,电信
+- RULE-SET,中国移动v4,移动
+- RULE-SET,中国移动v6,移动
+- RULE-SET,中国联通v4,联通
+- RULE-SET,中国联通v6,联通
+- RULE-SET,中国电信v4,电信
+- RULE-SET,中国电信v6,电信
+- RULE-SET,移动ASN,移动
+- RULE-SET,联通ASN,联通
+- RULE-SET,电信ASN,电信
+- GEOIP,LAN,DIRECT
+- GEOIP,CN,国内
+- MATCH,漏网之鱼
 
-  # ASN分流
-  - RULE-SET,移动ASN,移动
-  - RULE-SET,联通ASN,联通
-  - RULE-SET,电信ASN,电信
-
-  # 直连
-  - GEOIP,LAN,DIRECT
-  - GEOIP,CN,国内
-  - MATCH,漏网之鱼
+#external-controller: 0.0.0.0:9650 # 外部控制(API)
+#secret: ""  # API访问密钥
+#external-ui-url: https://gh-proxy.com/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip # 外部控制UI下载
+#external-ui: ui # 外部控制UI目录
