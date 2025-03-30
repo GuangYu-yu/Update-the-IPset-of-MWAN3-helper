@@ -6,7 +6,7 @@ dns:
   enable: true
   # DNS监听地址
   listen: 0.0.0.0:6123
-  default-nameserver:
+  nameserver:
   # 本地DNS服务器
   - 223.5.5.5
   - 223.6.6.6
@@ -32,18 +32,36 @@ proxies:
   interface-name: pppoe-cmcc
   udp: true
   routing-mark: 1
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
 - name: 联通
   type: direct
   ip-version: ipv6-prefer
   interface-name: pppoe-cnc
   udp: true
   routing-mark: 2
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
 - name: 电信
   type: direct
   ip-version: ipv6-prefer
   interface-name: pppoe-ct
   udp: true
   routing-mark: 3
+  health-check:
+    enable: true
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    lazy: false
 proxy-groups:
 - name: 国内
   type: select
