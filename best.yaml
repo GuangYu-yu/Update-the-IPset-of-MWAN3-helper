@@ -31,6 +31,7 @@ proxy-providers:
 # 节点信息
 proxies:
   - {name: 直连, type: direct}
+  - {name: 全球拦截, type: reject}
   - name: 移动
     type: direct
     ip-version: ipv6-prefer
@@ -155,6 +156,7 @@ dns:
 # 注意锚点必须放在引用的上方，可以集中把锚点全部放yaml的顶部。
 pr: &pr {type: select, proxies: [🚀 默认代理, ♻️ 香港自动, ♻️ 日本自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇺🇲 美国节点, 🌐 全部节点, 🇨🇳 国内, ♻️ 自建自动, ♻️ 机场自动, 🔮 机场均衡, ☑️ 机场切换, 🔮 自建均衡, ♻️ 优选自动, 🔮 优选均衡, 🇨🇳 国内]}
 proxy-groups:
+  - {name: 净化, type: select, proxies: [全球拦截]}
   - {name: ☁️ Cloudflare, <<: *pr}
   - {name: 🚀 默认代理, type: select, proxies: [♻️ 香港自动, ♻️ 日本自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇺🇲 美国节点, 🌐 全部节点, 🇨🇳 国内, ♻️ 自建自动, ♻️ 机场自动, 🔮 机场均衡, ☑️ 机场切换, 🔮 自建均衡, ♻️ 优选自动, 🔮 优选均衡]}
   - {name: 🌍 国外媒体, <<: *pr}
@@ -259,10 +261,10 @@ rules:
 #  - RULE-SET,proxylite,🚀 默认代理
   - RULE-SET,ai,🤖 ChatGPT
 
-  - RULE-SET,Advertising,REJECT
-  - RULE-SET,REJECTlist,REJECT
-  - RULE-SET,sr_ad_only,REJECT
-  - RULE-SET,广告,REJECT
+  - RULE-SET,Advertising,净化
+  - RULE-SET,REJECTlist,净化
+  - RULE-SET,sr_ad_only,净化
+  - RULE-SET,广告,净化
 
   - RULE-SET,国外媒体,🌍 国外媒体
   - RULE-SET,Epic,🎮 游戏平台
