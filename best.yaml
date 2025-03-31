@@ -44,6 +44,8 @@ proxies:
       interval: 300
       timeout: 5000
       lazy: false
+    mptcp: true
+
   - name: 联通
     type: direct
     ip-version: ipv6-prefer
@@ -56,6 +58,8 @@ proxies:
       interval: 300
       timeout: 5000
       lazy: false
+    mptcp: true
+
   - name: 电信
     type: direct
     ip-version: ipv6-prefer
@@ -68,6 +72,7 @@ proxies:
       interval: 300
       timeout: 5000
       lazy: false
+    mptcp: true
 
 # 全局配置 
 port: 7890
@@ -154,7 +159,7 @@ dns:
  
 # 出站策略
 # 注意锚点必须放在引用的上方，可以集中把锚点全部放yaml的顶部。
-pr: &pr {type: select, proxies: [🚀 默认代理, ♻️ 香港自动, ♻️ 日本自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇺🇲 美国节点, 🌐 全部节点, 🇨🇳 国内, ♻️ 自建自动, ♻️ 机场自动, 🔮 机场均衡, ☑️ 机场切换, 🔮 自建均衡, ♻️ 优选自动, 🔮 优选均衡, 🇨🇳 国内]}
+pr: &pr {type: select, proxies: [🚀 默认代理, ♻️ 香港自动, ♻️ 日本自动, ♻️ 美国自动, ♻️ 自动选择, 🇭🇰 香港节点, 🇯🇵 日本节点, 🇺🇲 美国节点, 🌐 全部节点, 🇨🇳 国内, ♻️ 自建自动, ♻️ 机场自动, 🔮 机场均衡, ☑️ 机场切换, 🔮 自建均衡, ♻️ 优选自动, 🔮 优选均衡]}
 proxy-groups:
   - {name: 净化, type: select, proxies: [全球拦截]}
   - {name: ☁️ Cloudflare, <<: *pr}
