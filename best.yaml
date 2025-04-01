@@ -299,9 +299,9 @@ rules:
   - RULE-SET,中国联通v6,联通
   - RULE-SET,中国电信v4,电信
   - RULE-SET,中国电信v6,电信
-  - RULE-SET,移动ASN,移动
-  - RULE-SET,联通ASN,联通
-  - RULE-SET,电信ASN,电信
+#  - RULE-SET,移动ASN,移动
+#  - RULE-SET,联通ASN,联通
+#  - RULE-SET,电信ASN,电信
   - RULE-SET,国内白名单,🇨🇳 国内
   - RULE-SET,中国规则,🇨🇳 国内
 
