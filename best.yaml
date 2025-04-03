@@ -352,64 +352,56 @@ rule-providers:
 
   中国规则:
     type: http
-    url: https://ghfast.top/https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/ChinaMax/ChinaMax.list
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script/rule/Clash/ChinaMax/ChinaMax.list
     interval: 86400
     behavior: classical
     format: text
     path: "./rule_provider/ChinaMax_Classical_No_Resolve.yaml"
   中国移动v4:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/cmcc.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v4.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/cmcc.txt"
+    path: "./rule_provider/China_Mobile_v4.txt"
   中国移动v6:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/cmcc6.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/cmcc6.txt"
+    path: "./rule_provider/China_Mobile_v6.txt"
   中国联通v4:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/unicom.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v4.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/unicom.txt"
+    path: "./rule_provider/China_Unicom_v4.txt"
   中国联通v6:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/unicom6.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/unicom6.txt"
+    path: "./rule_provider/China_Unicom_v6.txt"
   中国电信v4:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/chinanet.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v4.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/chinanet.txt"
+    path: "./rule_provider/China_Telecom_v4.txt"
   中国电信v6:
     type: http
-    url: https://gaoyifan.github.io/china-operator-ip/chinanet6.txt
-    proxy: DIRECT
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v6.txt
     interval: 86400
     behavior: ipcidr
     format: text
-    path: "./rule_provider/chinanet6.txt"
+    path: "./rule_provider/China_Telecom_v6.txt"
   移动ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/mobile_asn.yaml
-    proxy: DIRECT
     interval: 86400
     behavior: classical
     format: yaml
@@ -417,7 +409,6 @@ rule-providers:
   联通ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/unicom_asn.yaml
-    proxy: DIRECT
     interval: 86400
     behavior: classical
     format: yaml
@@ -425,7 +416,6 @@ rule-providers:
   电信ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/telecom_asn.yaml
-    proxy: DIRECT
     interval: 86400
     behavior: classical
     format: yaml
