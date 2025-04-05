@@ -45,7 +45,6 @@ proxies:
       timeout: 5000
       lazy: false
     mptcp: true
-    tfo: true
 
   - name: 联通
     type: direct
@@ -60,7 +59,6 @@ proxies:
       timeout: 5000
       lazy: false
     mptcp: true
-    tfo: true
 
   - name: 电信
     type: direct
@@ -75,7 +73,6 @@ proxies:
       timeout: 5000
       lazy: false
     mptcp: true
-    tfo: true
 
 # 全局配置 
 port: 7890
