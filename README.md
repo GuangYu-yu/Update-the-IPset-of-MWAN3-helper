@@ -61,19 +61,19 @@ name="cn6"; url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/ma
 ## cmcc6
 
 ```
-name="cmcc6"; url="https://gaoyifan.github.io/china-operator-ip/cmcc6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cmcc6"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cnc6
 
 ```
-name="cnc6"; url="https://gaoyifan.github.io/china-operator-ip/unicom6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cnc6"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## ct6
 
 ```
-name="ct6"; url="https://gaoyifan.github.io/china-operator-ip/chinanet6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
+name="ct6"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v6.txt"; type="6"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cn4
@@ -85,19 +85,19 @@ name="cn4"; url="https://mirror.ghproxy.com/https://raw.githubusercontent.com/ma
 ## cmcc4
 
 ```
-name="cmcc4"; url="https://gaoyifan.github.io/china-operator-ip/cmcc.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cmcc4"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v4.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## cnc4
 
 ```
-name="cnc4"; url="https://gaoyifan.github.io/china-operator-ip/unicom.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="cnc4"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v4.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 ## ct4
 
 ```
-name="ct4"; url="https://gaoyifan.github.io/china-operator-ip/chinanet.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
+name="ct4"; url="https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v4.txt"; type="4"; . /etc/ipset_configs/vars.sh; add_ipset
 ```
 
 # 计划任务
