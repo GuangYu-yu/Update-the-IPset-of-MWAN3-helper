@@ -287,6 +287,7 @@ proxy-groups:
 rules:
   - RULE-SET,☁️ CFv6,☁️ Cloudflare
   - RULE-SET,☁️ CF,☁️ Cloudflare
+  - RULE-SET,☁️ CF_domains,☁️ Cloudflare
   - RULE-SET,代理,🚀 默认代理
   - RULE-SET,代理白名单,🚀 默认代理
 
@@ -372,7 +373,7 @@ rule-providers:
 
   ☁️ CFv6: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/main/CloudflareCIDR-v6.list"}
   ☁️ CF: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/main/CloudflareCIDR.list"}
-  ☁️ CF: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/matching_domains.list"}
+  ☁️ CF_domains : { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/matching_domains.list"}
 
 #  cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
 #  cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
