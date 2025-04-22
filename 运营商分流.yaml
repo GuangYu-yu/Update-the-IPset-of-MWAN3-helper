@@ -1,0 +1,305 @@
+# 机场订阅
+
+# 节点信息
+proxies:
+  - name: 移动
+    type: direct
+    ip-version: ipv6-prefer
+    interface-name: pppoe-cmcc
+    udp: true
+    routing-mark: 1
+    health-check:
+      enable: true
+      url: https://www.qq.com/favicon.ico
+      interval: 300
+      timeout: 5000
+      lazy: false
+    mptcp: true
+
+  - name: 联通
+    type: direct
+    ip-version: ipv6-prefer
+    interface-name: pppoe-cnc
+    udp: true
+    routing-mark: 2
+    health-check:
+      enable: true
+      url: https://www.qq.com/favicon.ico
+      interval: 300
+      timeout: 5000
+      lazy: false
+    mptcp: true
+
+  - name: 电信
+    type: direct
+    ip-version: ipv6-prefer
+    interface-name: pppoe-ct
+    udp: true
+    routing-mark: 3
+    health-check:
+      enable: true
+      url: https://www.qq.com/favicon.ico
+      interval: 300
+      timeout: 5000
+      lazy: false
+    mptcp: true
+
+# 全局配置 
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+tproxy-port: 7894
+allow-lan: true
+bind-address: "*"
+ipv6: true
+unified-delay: true
+tcp-concurrent: true
+log-level: warning
+find-process-mode: 'off'
+global-client-fingerprint: chrome
+keep-alive-idle: 600
+keep-alive-interval: 15
+disable-keep-alive: false
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# 控制面板
+external-controller: 0.0.0.0:9090
+secret: ""
+external-ui: "ui"
+external-ui-name: zashboard
+external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
+
+# 嗅探
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  force-domain:
+    - "+.v2ex.com"
+  skip-domain:
+    - "rule-set:中国规则,private_domain"
+
+# 入站  
+tun:
+  enable: true
+  # system/gvisor/mixed
+  stack: mixed
+  dns-hijack: ["any:53", "tcp://any:53"]
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+
+# DNS模块
+dns:
+  enable: true
+  listen: 0.0.0.0:5874
+  ipv6: true
+  respect-rules: true
+  enhanced-mode: redir-host
+  default-nameserver:
+    - 223.5.5.5
+  proxy-server-nameserver:
+    - https://223.5.5.5/dns-query
+  nameserver:
+    - "127.0.0.1:53#\U0001F1E8\U0001F1F3 国内"
+#  fallback:
+#    - "127.0.0.1:53#\U0001F1E8\U0001F1F3 国内"
+#  fallback-filter:
+#    geoip: true
+#    geoip-code: CN
+#    ipcidr:
+#      - ::/128
+#      - ::1/128
+#      - 2001::/32
+#      - 0.0.0.0/8
+#      - 10.0.0.0/8
+#      - 100.64.0.0/10
+#      - 127.0.0.0/8
+#      - 169.254.0.0/16
+#      - 172.16.0.0/12
+#      - 192.0.0.0/24
+#      - 192.0.2.0/24
+#      - 192.88.99.0/24
+#      - 192.168.0.0/16
+#      - 198.51.100.0/24
+#      - 203.0.113.0/24
+#      - 224.0.0.0/4
+#      - 240.0.0.0/4
+#      - 255.255.255.255/32
+#    domain:
+#      - "+.google.com"
+#      - "+.facebook.com"
+#      - "+.youtube.com"
+#      - "+.githubusercontent.com"
+#      - "+.googlevideo.com"
+#      - "+.msftconnecttest.com"
+#      - "+.msftncsi.com"
+ 
+# 出站策略
+# 注意锚点必须放在引用的上方，可以集中把锚点全部放yaml的顶部。
+proxy-groups:
+
+  - name: 三大运营商
+    type: url-test
+    proxies:
+    - 移动
+    - 联通
+    - 电信
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+  - name: 🇨🇳 国内
+    type: select
+    proxies:
+    - 三大运营商
+    - 一致性哈希
+    - 会话保持
+    - 轮询
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+  - name: 一致性哈希
+    type: load-balance
+    strategy: consistent-hashing
+    proxies:
+    - 移动
+    - 联通
+    - 电信
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+  - name: 会话保持
+    type: load-balance
+    strategy: sticky-sessions
+    proxies:
+    - 移动
+    - 联通
+    - 电信
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+  - name: 轮询
+    type: load-balance
+    strategy: round-robin
+    proxies:
+    - 移动
+    - 联通
+    - 电信
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+    - 三大运营商
+    - 一致性哈希
+    - 会话保持
+    - 轮询
+    url: https://www.qq.com/favicon.ico
+    interval: 300
+    timeout: 5000
+    max-failed-times: 5
+
+# 规则匹配
+# 此规则部分没有做防泄露处理，因为弊严重大于利！
+rules:
+  - RULE-SET,中国移动v4,移动
+  - RULE-SET,中国移动v6,移动
+  - RULE-SET,中国联通v4,联通
+  - RULE-SET,中国联通v6,联通
+  - RULE-SET,中国电信v4,电信
+  - RULE-SET,中国电信v6,电信
+#  - RULE-SET,移动ASN,移动
+#  - RULE-SET,联通ASN,联通
+#  - RULE-SET,电信ASN,电信
+#  - RULE-SET,中国规则,🇨🇳 国内
+
+  - MATCH,🐟 漏网之鱼
+
+# 规则集
+rule-providers: 
+
+#  中国规则:
+#    type: http
+#    url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script/rule/Clash/ChinaMax/ChinaMax.list
+#    interval: 86400
+#    behavior: classical
+#    format: text
+#    path: "./rule_provider/ChinaMax_Classical_No_Resolve.yaml"
+  中国移动v4:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v4.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Mobile_v4.txt"
+  中国移动v6:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v6.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Mobile_v6.txt"
+  中国联通v4:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v4.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Unicom_v4.txt"
+  中国联通v6:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v6.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Unicom_v6.txt"
+  中国电信v4:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v4.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Telecom_v4.txt"
+  中国电信v6:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v6.txt
+    interval: 86400
+    behavior: ipcidr
+    format: text
+    path: "./rule_provider/China_Telecom_v6.txt"
+  移动ASN:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/mobile_asn.yaml
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: "./rule_provider/mobile_asn.yaml"
+  联通ASN:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/unicom_asn.yaml
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: "./rule_provider/unicom_asn.yaml"
+  电信ASN:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/telecom_asn.yaml
+    interval: 86400
+    behavior: classical
+    format: yaml
+    path: "./rule_provider/telecom_asn.yaml"
