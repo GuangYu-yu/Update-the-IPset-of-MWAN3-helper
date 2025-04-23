@@ -209,6 +209,9 @@ proxy-groups:
     - 一致性哈希
     - 会话保持
     - 轮询
+    - 移动
+    - 联通
+    - 电信
     url: https://www.qq.com/favicon.ico
     interval: 300
     timeout: 5000
@@ -226,20 +229,20 @@ rules:
 #  - RULE-SET,移动ASN,移动
 #  - RULE-SET,联通ASN,联通
 #  - RULE-SET,电信ASN,电信
-#  - RULE-SET,中国规则,🇨🇳 国内
+  - RULE-SET,中国规则,🇨🇳 国内
 
   - MATCH,🐟 漏网之鱼
 
 # 规则集
 rule-providers: 
 
-#  中国规则:
-#    type: http
-#    url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script/rule/Clash/ChinaMax/ChinaMax.list
-#    interval: 86400
-#    behavior: classical
-#    format: text
-#    path: "./rule_provider/ChinaMax_Classical_No_Resolve.yaml"
+  中国规则:
+    type: http
+    url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script/rule/Clash/ChinaMax/ChinaMax.list
+    interval: 86400
+    behavior: classical
+    format: text
+    path: "./rule_provider/ChinaMax_Classical_No_Resolve.yaml"
   中国移动v4:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v4.txt
