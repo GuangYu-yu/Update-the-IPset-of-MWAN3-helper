@@ -20,7 +20,7 @@ proxy-providers:
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
-      interval: 300
+      interval: 1200
     override:
       dialer-proxy: 轮询
       mptcp: true
@@ -34,7 +34,7 @@ proxy-providers:
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
-      interval: 300
+      interval: 1200
     override:
       dialer-proxy: 轮询
       mptcp: true
@@ -53,7 +53,7 @@ proxies:
     health-check:
       enable: true
       url: https://www.qq.com/favicon.ico
-      interval: 300
+      interval: 60
       timeout: 5000
       lazy: false
     mptcp: true
@@ -67,7 +67,7 @@ proxies:
     health-check:
       enable: true
       url: https://www.qq.com/favicon.ico
-      interval: 300
+      interval: 60
       timeout: 5000
       lazy: false
     mptcp: true
@@ -81,7 +81,7 @@ proxies:
     health-check:
       enable: true
       url: https://www.qq.com/favicon.ico
-      interval: 300
+      interval: 60
       timeout: 5000
       lazy: false
     mptcp: true
@@ -154,7 +154,7 @@ dns:
   nameserver:
     - "223.5.5.5:53#\U0001F1E8\U0001F1F3 国内"
   fallback:
-    - tls://127.0.0.1:6553
+    - tls://one.one.one.one:853
   fallback-filter:
     geoip: true
     geoip-code: CN
