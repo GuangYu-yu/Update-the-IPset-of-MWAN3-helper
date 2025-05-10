@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # 创建配置目录
 mkdir -p /etc/ipset_configs
