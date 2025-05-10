@@ -239,70 +239,70 @@ rule-providers:
   中国规则:
     type: http
     url: https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script/rule/Clash/ChinaMax/ChinaMax.list
-    interval: 86400
+    interval: 3600
     behavior: classical
     format: text
     path: "./rule_provider/ChinaMax_Classical_No_Resolve.yaml"
   中国移动v4:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v4.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Mobile_v4.txt"
   中国移动v6:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Mobile_v6.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Mobile_v6.txt"
   中国联通v4:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v4.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Unicom_v4.txt"
   中国联通v6:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Unicom_v6.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Unicom_v6.txt"
   中国电信v4:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v4.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Telecom_v4.txt"
   中国电信v6:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr/China_Telecom_v6.txt
-    interval: 86400
+    interval: 3600
     behavior: ipcidr
     format: text
     path: "./rule_provider/China_Telecom_v6.txt"
   移动ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/mobile_asn.yaml
-    interval: 86400
+    interval: 3600
     behavior: classical
     format: yaml
     path: "./rule_provider/mobile_asn.yaml"
   联通ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/unicom_asn.yaml
-    interval: 86400
+    interval: 3600
     behavior: classical
     format: yaml
     path: "./rule_provider/unicom_asn.yaml"
   电信ASN:
     type: http
     url: https://cdn.jsdelivr.net/gh/GuangYu-yu/chinaisp-cidr@main/telecom_asn.yaml
-    interval: 86400
+    interval: 3600
     behavior: classical
     format: yaml
     path: "./rule_provider/telecom_asn.yaml"
