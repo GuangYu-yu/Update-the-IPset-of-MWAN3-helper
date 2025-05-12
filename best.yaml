@@ -285,6 +285,14 @@ proxy-groups:
 # 规则匹配
 # 此规则部分没有做防泄露处理，因为弊严重大于利！
 rules:
+  - RULE-SET,手动直连,🇨🇳 国内
+  - RULE-SET,手动净化,净化
+  
+
+  - RULE-SET,Advertising,净化
+  - RULE-SET,sr_ad_only,净化
+  - RULE-SET,广告,净化
+  
   - RULE-SET,☁️ CFv6,☁️ Cloudflare
   - RULE-SET,☁️ CF,☁️ Cloudflare
   - RULE-SET,☁️ CF_domains,☁️ Cloudflare
@@ -296,11 +304,6 @@ rules:
   - RULE-SET,apple_domain,🍎 Apple
 #  - RULE-SET,proxylite,🚀 默认代理
   - RULE-SET,ai,🤖 ChatGPT
-
-  - RULE-SET,Advertising,净化
-  - RULE-SET,REJECTlist,净化
-  - RULE-SET,sr_ad_only,净化
-  - RULE-SET,广告,净化
 
   - RULE-SET,国外媒体,🌍 国外媒体
   - RULE-SET,Epic,🎮 游戏平台
@@ -330,7 +333,6 @@ rules:
 #  - RULE-SET,移动ASN,移动
 #  - RULE-SET,联通ASN,联通
 #  - RULE-SET,电信ASN,电信
-  - RULE-SET,国内白名单,🇨🇳 国内
   - RULE-SET,中国规则,🇨🇳 国内
 
   - MATCH,🐟 漏网之鱼
@@ -346,6 +348,8 @@ rule-providers:
 
   代理: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/filtered.list"}
   代理白名单: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/main/proxy.list"}
+  手动直连: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/direct.list"}
+  手动净化: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/REJECT.list"}
 
   ai: {  <<: *domain, url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs" }
   google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs"}
@@ -361,11 +365,9 @@ rule-providers:
   geolocation-!cn: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
 
   Advertising: { <<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Advertising/Advertising.list"}
-  REJECTlist: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/refs/heads/main/REJECT.list"}
   sr_ad_only: { <<: *class, url: "https://johnshall.github.io/Shadowrocket-ADBlock-Rules-Forever/sr_ad_only.conf"}
   广告: { <<: *domain, url: "https://raw.githubusercontent.com/GuangYu-yu/AdBlock_Rule_For_Clash/refs/heads/main/adblock_reject.mrs"}
 
-  国内白名单: { <<: *class, url: "https://raw.githubusercontent.com/GuangYu-yu/ACL4SSR/main/direct.list"}
   国外媒体: { <<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia.list"}
   Epic: { <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/master/ProxyLite.list"}
   Origin: { <<: *class, url: "https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/master/ProxyLite.list"}
