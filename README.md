@@ -2,6 +2,8 @@
 
 无需安装mwan3 helper，通过终端添加ipset并自动更新，设置持久化和开机自启。在同一个IPset内，不能同时调用IPv4和IPv6，因此选择分开执行
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/GuangYu-yu/Update-the-IPset-of-MWAN3-helper)
+
 # 终端内首次运行
 
 ```
